@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-
 String _name = 'Your Name';
 
 class ChatMessage extends StatelessWidget {
@@ -14,7 +13,7 @@ class ChatMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizeTransition(
       sizeFactor:
-      CurvedAnimation(parent: animationController, curve: Curves.easeOut),
+          CurvedAnimation(parent: animationController, curve: Curves.easeOut),
       axisAlignment: 0.0,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 10.0),
@@ -45,8 +44,8 @@ class ChatMessage extends StatelessWidget {
 }
 
 class ChatScreen extends StatefulWidget {
-  ChatScreen(String name){
-    _name=name;
+  ChatScreen(String name) {
+    _name = name;
   }
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -59,11 +58,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   bool _isComposing = false;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    
-    var snapshots = Firestore.instance.collection('messages').orderBy('dateTime', descending: true).limit(10).snapshots();
-    snapshots.listen((QuerySnapshot snapshot){
+
+    var snapshots = Firestore.instance
+        .collection('messages')
+        .orderBy('dateTime', descending: true)
+        .limit(20)
+        .snapshots();
+    snapshots.listen((QuerySnapshot snapshot) {
       var message = ChatMessage(
         text: snapshot.documents.first['content'],
         animationController: AnimationController(
@@ -71,32 +74,30 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           vsync: this,
         ),
       );
-      setState((){
-        _messages.insert(0,message);
-
+      setState(() {
+        _messages.insert(0, message);
       });
       message.animationController.forward();
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('FriendlyChat'),
+        title: Text('채팅'),
         elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
       ),
       body: Container(
         decoration: Theme.of(context).platform == TargetPlatform.iOS //new
             ? BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.grey[200]),
-          ),
-        )
+                border: Border(
+                  top: BorderSide(color: Colors.grey[200]),
+                ),
+              )
             : null,
         child: Column(
           children: [
-
             Flexible(
               child: ListView.builder(
                 padding: EdgeInsets.all(8.0),
@@ -123,18 +124,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         margin: EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(
           children: [
-            IconButton(
-                icon:Icon(Icons.image),
-                onPressed:(){
-
-                }
-            ),
-            IconButton(
-                icon:Icon(Icons.face),
-                onPressed:(){
-
-                }
-            ),
+            IconButton(icon: Icon(Icons.image), onPressed: () {}),
+            IconButton(icon: Icon(Icons.face), onPressed: () {}),
             Flexible(
               child: TextField(
                 controller: _textController,
@@ -145,7 +136,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 },
                 onSubmitted: _isComposing ? _handleSubmitted : null,
                 decoration:
-                InputDecoration.collapsed(hintText: 'Send a message'),
+                    InputDecoration.collapsed(hintText: 'Send a message'),
                 focusNode: _focusNode,
               ),
             ),
@@ -153,17 +144,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 margin: EdgeInsets.symmetric(horizontal: 4.0),
                 child: Theme.of(context).platform == TargetPlatform.iOS
                     ? CupertinoButton(
-                  onPressed: _isComposing
-                      ? () => _handleSubmitted(_textController.text)
-                      : null,
-                  child: Text('Send'),
-                )
+                        onPressed: _isComposing
+                            ? () => _handleSubmitted(_textController.text)
+                            : null,
+                        child: Text('Send'),
+                      )
                     : IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _isComposing
-                      ? () => _handleSubmitted(_textController.text)
-                      : null,
-                ))
+                        icon: const Icon(Icons.send),
+                        onPressed: _isComposing
+                            ? () => _handleSubmitted(_textController.text)
+                            : null,
+                      ))
           ],
         ),
       ),
@@ -176,12 +167,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       _isComposing = false;
     });
 
-
-      Firestore.instance.collection('messages').add({
-        'content':text,
-        'type':'text',
-        'dateTime': DateTime.now()
-      });
+    Firestore.instance
+        .collection('messages')
+        .add({'content': text, 'type': 'text', 'dateTime': DateTime.now()});
     _focusNode.requestFocus();
   }
 

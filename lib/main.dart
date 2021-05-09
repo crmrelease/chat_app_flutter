@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'chat_screen.dart';
-import 'login_screen.dart';
+import 'screen/login.dart';
 
 void main() {
   runApp(
@@ -20,7 +19,6 @@ final ThemeData kDefaultTheme = ThemeData(
   primarySwatch: Colors.purple,
   accentColor: Colors.orangeAccent[400],
 );
-
 
 class ChatApp extends StatelessWidget {
   const ChatApp({key}) : super(key: key);
