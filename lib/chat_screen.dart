@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -58,6 +59,27 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   bool _isComposing = false;
 
   @override
+  void initState(){
+    super.initState();
+    
+    var snapshots = Firestore.instance.collection('messages').orderBy('dateTime', descending: true).limit(10).snapshots();
+    snapshots.listen((QuerySnapshot snapshot){
+      var message = ChatMessage(
+        text: snapshot.documents.first['content'],
+        animationController: AnimationController(
+          duration: const Duration(milliseconds: 700),
+          vsync: this,
+        ),
+      );
+      setState((){
+        _messages.insert(0,message);
+
+      });
+      message.animationController.forward();
+    });
+  }
+  
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -74,6 +96,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             : null,
         child: Column(
           children: [
+
             Flexible(
               child: ListView.builder(
                 padding: EdgeInsets.all(8.0),
@@ -100,6 +123,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         margin: EdgeInsets.symmetric(horizontal: 8.0),
         child: Row(
           children: [
+            IconButton(
+                icon:Icon(Icons.image),
+                onPressed:(){
+
+                }
+            ),
+            IconButton(
+                icon:Icon(Icons.face),
+                onPressed:(){
+
+                }
+            ),
             Flexible(
               child: TextField(
                 controller: _textController,
@@ -140,18 +175,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     setState(() {
       _isComposing = false;
     });
-    var message = ChatMessage(
-      text: text,
-      animationController: AnimationController(
-        duration: const Duration(milliseconds: 700),
-        vsync: this,
-      ),
-    );
-    setState(() {
-      _messages.insert(0, message);
-    });
+
+
+      Firestore.instance.collection('messages').add({
+        'content':text,
+        'type':'text',
+        'dateTime': DateTime.now()
+      });
     _focusNode.requestFocus();
-    message.animationController.forward();
   }
 
   @override
